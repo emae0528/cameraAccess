@@ -1,40 +1,58 @@
- <div id="video-container">
-   <!--   <video id="camera-stream" width="500" autoplay></video> -->
-    <%= video_tag :width => "500", :id => "camera-stream" %>
+<div id="allow"><br/> </div>
+
+<div class="row">
+  <div class="col-md-6">
+     <div class="item">
+      <span> video </span>
+      <video id="video" width="320" height="240" autoplay="autoplay" ></video>
+    </div>
   </div>
+
+ <div class="col-md-6">
+    <div class="item">
+      <span> canvas </span>
+      <canvas id="canvas" width="320" height="240" ></canvas>
+    </div>
+</div>
+</div>
+
+<input id="button" type="button" value="Capture" />
+
 <script type="text/javascript">
-	 window.onload = function() {
 
-  // Normalize the various vendor prefixed versions of getUserMedia.
-  navigator.getUserMedia = (navigator.getUserMedia ||
-                            navigator.webkitGetUserMedia ||
-                            navigator.mozGetUserMedia || 
-                            navigator.msGetUserMedia);
+  window.onload = function () {
+    var canvas = document.getElementById('canvas');
+    var video = document.getElementById('video');
+    var button = document.getElementById('button');
+    var allow = document.getElementById('allow');
+    var context = canvas.getContext('2d');
+    var videoStreamUrl = false;
 
-  if (navigator.getUserMedia) {
-  // Request the camera.
-  navigator.getUserMedia(
-    // Constraints
-    {
-      video: true
-    },
-
-    // Success Callback
-    function(localMediaStream) {
-
-    },
-
-    // Error Callback
-    function(err) {
-      // Log the error to the console.
-      console.log('The following error occurred when trying to use getUserMedia: ' + err);
+    var captureMe = function () {
+      if (!videoStreamUrl) alert('That is if you do not press "allow" in the top of the window, that there is something wrong with your video the streams')
+      context.translate(canvas.width, 0);
+      context.scale(-1, 1);
+      context.drawImage(video, 0, 0, video.width, video.height);
+      var base64dataUrl = canvas.toDataURL('image/png');
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      var img = new Image();
+      img.src = base64dataUrl;
+      window.document.body.appendChild(img);
     }
-  );
 
-} else {
-  alert('Sorry, your browser does not support getUserMedia');
-}
+    button.addEventListener('click', captureMe);
 
-}
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    window.URL.createObjectURL = window.URL.createObjectURL || window.URL.webkitCreateObjectURL || window.URL.mozCreateObjectURL || window.URL.msCreateObjectURL;
+
+    navigator.getUserMedia({video: true}, function (stream) {
+
+      allow.style.display = "none";
+      videoStreamUrl = window.URL.createObjectURL(stream);
+      video.src = videoStreamUrl;
+    }, function () {
+      console.log('something is wrong with videostrimom or user denied use it');
+    });
+  };
 
 </script>
