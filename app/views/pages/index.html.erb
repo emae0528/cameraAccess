@@ -1,15 +1,15 @@
 <div id="allow"><br/> </div>
 
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-md-4">
      <div class="item">
       <span> video </span>
       <video id="video" width="320" height="240" autoplay="autoplay" ></video>
     </div>
   </div>
 
- <div class="col-md-6">
-    <div class="item">
+ <div class="col-md-4">
+    <div class="item" style="display:none;">
       <span> canvas </span>
       <canvas id="canvas" width="320" height="240" ></canvas>
     </div>
@@ -17,6 +17,7 @@
 </div>
 
 <input id="button" type="button" value="Capture" />
+
 
 <script type="text/javascript">
 
@@ -53,6 +54,28 @@
     }, function () {
       console.log('something is wrong with videostrimom or user denied use it');
     });
+
+    vid.src = window.URL.createObjectURL(localMediaStream);
   };
+
+var blobBin = atob(dataURL.split(',')[1]);
+var array = [];
+for(var i = 0; i < blobBin.length; i++) {
+    array.push(blobBin.charCodeAt(i));
+}
+var file=new Blob([new Uint8Array(array)], {type: 'image/png'});
+
+
+var formdata = new FormData();
+formdata.append("myNewFileName", file);
+$.ajax({
+   url: "uploadFile.php",
+   type: "POST",
+   data: formdata,
+   processData: false,
+   contentType: false,
+}).done(function(respond){
+  alert(respond);
+});
 
 </script>
